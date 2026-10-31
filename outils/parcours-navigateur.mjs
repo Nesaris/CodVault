@@ -12,7 +12,7 @@ const [base, jeton, sortie = '/tmp/captures-codvault'] = process.argv.slice(2);
 fs.mkdirSync(sortie, { recursive: true });
 // codvault.test : un nom qui n'est pas localhost, pour voir CODVAULT servi en HTTP hors contexte sûr.
 const navigateur = await chromium.launch({ args: ['--host-resolver-rules=MAP codvault.test 127.0.0.1'] });
-const contexte = await navigateur.newContext({ viewport: { width: 1280, height: 860 }, permissions: ['clipboard-read', 'clipboard-write'] });
+const contexte = await navigateur.newContext({ viewport: { width: 1280, height: 860 }, colorScheme: process.env.PARCOURS_SOMBRE === '1' ? 'dark' : 'light', permissions: ['clipboard-read', 'clipboard-write'] });
 const page = await contexte.newPage();
 const erreurs = [];
 page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource.*(404|401)/.test(m.text())) erreurs.push(m.text()); });
@@ -82,8 +82,17 @@ const ajouter = async ({ nom, site, ident, mdp, totp, espace }) => {
 await ajouter({ nom: 'GitHub', site: 'github.com', ident: 'codex', totp: 'JBSWY3DPEHPK3PXP', espace: 'Travail' });
 await page.waitForTimeout(200);
 await controle('ajout-fait');
-await ajouter({ nom: 'Fournisseur d’accès à Internet — espace client et factures', site: 'https://espace-client.fournisseur-exemple.fr/connexion', ident: 'adresse.tres.longue.pour.tester@exemple.org', mdp: 'azerty123', espace: 'Personnel' });
-await ajouter({ nom: 'Forum', site: 'forum.exemple.org', ident: 'codex', mdp: 'azerty123' });
+if (process.env.PARCOURS_VITRINE === '1') {
+  // Captures de présentation : de vrais sites (les logos viennent de la vitrine).
+  await ajouter({ nom: 'Amazon', site: 'amazon.fr', ident: 'ana.martin@exemple.org', mdp: 'azerty123', espace: 'Personnel' });
+  await ajouter({ nom: 'Discord', site: 'discord.com', ident: 'ana', mdp: 'azerty123' });
+  await ajouter({ nom: 'Spotify', site: 'spotify.com', ident: 'ana.martin@exemple.org', espace: 'Personnel' });
+  await ajouter({ nom: 'Proton Mail', site: 'proton.me', ident: 'ana.martin', espace: 'Personnel' });
+  await ajouter({ nom: 'Steam', site: 'store.steampowered.com', ident: 'ana_m', espace: 'Personnel' });
+} else {
+  await ajouter({ nom: 'Fournisseur d’accès à Internet — espace client et factures', site: 'https://espace-client.fournisseur-exemple.fr/connexion', ident: 'adresse.tres.longue.pour.tester@exemple.org', mdp: 'azerty123', espace: 'Personnel' });
+  await ajouter({ nom: 'Forum', site: 'forum.exemple.org', ident: 'codex', mdp: 'azerty123' });
+}
 await page.getByRole('button', { name: 'Note', exact: true }).click();
 await dialogue().getByLabel('Nom', { exact: true }).fill('Code du portail');
 await dialogue().getByLabel('Contenu').fill('Portail : 4711\nBoîte aux lettres : 3');
