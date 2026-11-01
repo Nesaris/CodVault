@@ -4,7 +4,7 @@
 # d'administration délégué au socle) et ne voit jamais le contenu des coffres.
 services:
   codvault:
-    image: ghcr.io/codexx64/codvault:{{config.IMAGE_TAG}}
+    image: ghcr.io/nesaris/codvault:{{config.IMAGE_TAG}}
     container_name: {{service.host}}
     restart: unless-stopped
     networks: [hub]

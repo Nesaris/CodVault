@@ -7,7 +7,7 @@ name: codvault
 services:
   codvault:
     build: .
-    image: ghcr.io/codexx64/codvault:1.0.0
+    image: ghcr.io/nesaris/codvault:1.0.0
     container_name: codvault
     restart: unless-stopped
     ports: ["127.0.0.1:8175:8175"]
